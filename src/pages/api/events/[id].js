@@ -27,7 +27,8 @@ export default (req, res) => {
     }
 
     else if(req.method === 'PUT'){
-        const body = req.body
+        var body = req.body
+        body.id = id
 
         updateEvent(body, (err, result) => {
             if (err) {

@@ -4,11 +4,10 @@ module.exports = {
   // Create an event
   createEvent: (data, callback) => {
     pool.query(
-      `insert into events(name, location) values(?, ?)`,
-      [data.name, data.location],
+      `insert into events(name, location, date) values(?, ?, ?)`,
+      [data.name, data.location, data.date],
       (err, result) => {
         if (err) {
-          console.log(err)
           callback(err);
         }
         else {
@@ -42,9 +41,10 @@ module.exports = {
   updateEvent: (data, callback) => {
     pool.query(
       `update events set name=?, location=?, date=? where id=?`,
-      [data.name, date.location, date.date, data.id],
+      [data.name, data.location, data.date, data.id],
       (err, result) => {
         if (err) {
+          console.log(err)
           return callback(err);
         }
         return callback(null, result);
