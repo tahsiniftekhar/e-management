@@ -1,82 +1,79 @@
-const {
-    getEventByID, updateEvent, deleteEvent
-} = require('../../../routeHandlers/eventHandler')
+import db from "../../../model";
+db.sequelize.sync();
+const Event = db.events;
 
-export default (req, res) => {
-    const {id} = req.query
+export default async (req, res) => {
+  const { id } = req.query;
 
-    if (req.method === 'GET') {
-        getEventByID(id, (err, result) => {
-            if(err){
-                return res.status(500).json({
-                    success: 0,
-                    message: "Database connection error!"
-                })
-            }
-            if (!result) {
-                return res.status(400).json({
-                    success: 0,
-                    message: "Record not found"
-                })
-            }
-            return res.status(200).json({
-                success: 1,
-                data: result
-            })
-        })
+  if (req.method === "GET") {
+    try {
+      const eventData = await Event.findByPk(id);
+      if (eventData !== null) {
+        res.status(200).json({
+          message: "Success",
+          result: eventData,
+        });
+      } else {
+        res.status(404).json({ message: "record not found" });
+      }
+    } catch (err) {
+      res.status(500).json({
+        error: "There was a server side error!",
+      });
     }
+  }
 
-    else if(req.method === 'PUT'){
-        var body = req.body
-        body.id = id
-
-        updateEvent(body, (err, result) => {
-            if (err) {
-                return res.status(500).json({
-                    success: 0,
-                    message: "Database connection error"
-                }) 
-            }
-            if (!result.affectedRows) {
-                return res.status(400).json({
-                    success: 0,
-                    message: "Failed to update event"
-                })
-            }
-            console.log(result)
-            return res.status(200).json({
-                success: 1,
-                message: "Updated successfully",
-                data: result,
-            })
-        })
+  // Update event by Id
+  else if (req.method === "PUT") {
+    const eventData = await Event.findByPk(id);
+    const updatedData = {
+        name: req.body.name ? req.body.name : eventData.name,
+        location: req.body.location ? req.body.location : eventData.location,
+        date: req.body.date ? req.body.date : eventData.date,
     }
+    Event.update(
+      updatedData,
+      { where: { id } }
+    )
+      .then((results) => {
+          console.log(results)
+        if (!results[0]) {
+            res.status(404).json({ message: "Failed to update" });
+          
+        } else {
+            res
+            .status(200)
+            .json({ message: "Updated successfully", data: updatedData});
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+        res.status(500).json({
+          error: "There was a server side error!",
+        });
+      });
+  }
 
-    else if(req.method === 'DELETE'){
-        deleteEvent(id, (err, result) => {
-            if (err) {
-                return res.status(500).json({
-                    success: 0,
-                    message: "Database connection error"
-                })
-            }
-            if (!result.affectedRows) {
-                return res.status(400).json({
-                    success: 0,
-                    message: "Record not found"
-                })
-            }
-            return res.status(200).json({
-                success: 1,
-                message: "event deleted successfully"
-            })
-        })
-    }
-
-    else{
-        return res.status(500).json({
-            success: 0,
-            message: "server side error"
-        })
-    }
-}
+  // Delete event by Id
+  else if (req.method === "DELETE") {
+    Event.destroy({ where: { id } })
+      .then((deletedRecord) => {
+        if (deletedRecord === 1) {
+          res.status(200).json({ message: "Deleted successfully" });
+        } else {
+          res.status(404).json({ message: "record not found" });
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+        res.status(500).json({
+          error: "There was a server side error!",
+        });
+      });
+  } else {
+    return res.status(500).json({
+      success: 0,
+      message: "server side error",
+    });
+  }
+};
