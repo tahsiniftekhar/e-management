@@ -4,13 +4,33 @@ body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
     Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+  background-color: #F7FAFC !important;
 }
 
 a {
   color: inherit;
-  text-decoration: none;
+  text-decoration: none !important;
 }
 
 * {
   box-sizing: border-box;
+}
+
+.centerItems {
+  right: 50%;
+  bottom: 50%;
+  transform: translate(50%,50%);
+  position: absolute;
+}
+
+th {
+  color: #B0BBC6 !important;
+}
+
+tr {
+  border-style: hidden !important;
+}
+
+.card-header, .card-footer {
+  background-color: #FFFFFF !important;
 }

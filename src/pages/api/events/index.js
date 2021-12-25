@@ -1,4 +1,4 @@
-import db from "../../model";
+import db from "../../../model";
 db.sequelize.sync();
 const Event = db.events;
 
